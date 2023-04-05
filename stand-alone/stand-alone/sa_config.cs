@@ -11,7 +11,6 @@ namespace stand_alone
     {
         rez_command,
         setup_project,
-        seting,
         local_build,
         project_info,
         quit
@@ -39,5 +38,12 @@ namespace stand_alone
         view,
         bundle
 
+    }
+
+    public enum LocalBuildSeting
+    {
+        rez_env_to_local,
+        rez_env_to_local_all,
+        cp_python_path_to_local
     }
 }

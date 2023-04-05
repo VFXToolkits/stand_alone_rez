@@ -58,6 +58,16 @@ class Program
             case InputCommandType.setup_project:
                 select_command.setup_project();
                 break;
+            case InputCommandType.quit:
+                Console.WriteLine("Bye");
+                Environment.Exit(0);
+                break;
+            case InputCommandType.local_build:
+                select_command.local_build();
+                break;
+            case InputCommandType.project_info:
+                select_command.project_info();
+                break;
             default:
                 throw new ArgumentOutOfRangeException();
         }
