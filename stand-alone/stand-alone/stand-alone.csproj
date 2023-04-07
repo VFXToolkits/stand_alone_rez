@@ -16,4 +16,8 @@
     <ProjectReference Include="..\rez\rez.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="template\build\" />
+  </ItemGroup>
+
 </Project>

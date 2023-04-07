@@ -14,7 +14,7 @@ namespace rez
         private string? get_current_url;
         private string join_env_str = ";";
 
-        protected readonly RestClient http_client;
+        protected readonly RestClient? http_client;
 
         public REZRequest(string rez_command) {
             if (rez_command.Contains(" -- "))
