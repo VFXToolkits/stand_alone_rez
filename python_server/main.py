@@ -3,12 +3,14 @@
 import sys
 from flask import Flask
 from api.rez_env import rez_env_api
+from api.rez_search import rez_res_api
 
 
 def create_app() -> Flask:
     app = Flask(__name__)
 
     app.register_blueprint(rez_env_api)
+    app.register_blueprint(rez_res_api)
     return app
 
 

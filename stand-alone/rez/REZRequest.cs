@@ -1,6 +1,7 @@
 ﻿using Newtonsoft.Json;
 using RestSharp;
 using System.Diagnostics;
+using System.Net.Http;
 
 
 namespace rez
@@ -9,12 +10,11 @@ namespace rez
     {
         public string rez_command_str;
         public string? rez_exec;
+        public ConfigField config_field = new ConfigField();
 
         private string json_path = Path.Combine(Environment.CurrentDirectory, "rez_connect_config.json");
         private string? get_current_url;
         private string join_env_str = ";";
-
-        protected readonly RestClient? http_client;
 
         public REZRequest(string rez_command) {
             if (rez_command.Contains(" -- "))
@@ -32,10 +32,6 @@ namespace rez
             if (get_current_url == null)
             {
                 Console.WriteLine("Failed to read configuration file");
-            }
-            else
-            {
-                http_client = new RestClient(get_current_url);
             }
 
         }
@@ -130,7 +126,6 @@ namespace rez
         private void load_url_config() {
             if (File.Exists(json_path))
             {
-                var config_field = new ConfigField();
                 config_field = JsonConvert.DeserializeObject<ConfigField>(File.ReadAllText(json_path));
                 if (config_field != null)
                 {
@@ -148,8 +143,15 @@ namespace rez
 
         }
 
-        public ApiResponse GetRezEnv()
+        public ApiResponse GetRezEnv(string env_base_url="")
         {
+            if (env_base_url == "")
+            {
+                env_base_url = get_current_url;
+            }
+
+            RestClient http_client = new RestClient(env_base_url);
+
             var request = new RestRequest("env");
             request.Method = Method.Post;
             request.AddHeader("Content-Type", "application/json");

@@ -5,5 +5,4 @@
 {{rez_env_body}}
 
 
-start "app" {{run_app}}
-
+start /B "App" {{run_app}}

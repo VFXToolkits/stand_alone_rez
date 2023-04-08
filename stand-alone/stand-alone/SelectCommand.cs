@@ -63,6 +63,8 @@ namespace stand_alone
     {
         private REZTool? rez_instance;
         private Dictionary<string, string>? get_current_env;
+        private Dictionary<string, string>? get_window_env;
+        private Dictionary<string, string>? get_linux_env;
 
         private string template_path = Path.Combine(Environment.CurrentDirectory, "template");
 
@@ -77,7 +79,8 @@ namespace stand_alone
             }
 
             rez_instance = new REZTool(rez_env_args);
-            get_current_env = rez_instance.get_rez_run_env();
+            get_window_env = rez_instance.get_windows_env();
+            get_linux_env = rez_instance.get_linux_env();
 
         }
 
@@ -90,32 +93,38 @@ namespace stand_alone
         public void export_env_to_path(string export_path, string app_name) {
             export_path = export_path.Replace("\\", "/");
 
-            string window_env = "";
-            string linux_env = "";
-
             string windows_content = File.ReadAllText(Path.Combine(template_path, "dcc_env/run_cmd.bat"));
             string linux_content = File.ReadAllText(Path.Combine(template_path, "dcc_env/run_cmd.sh"));
 
-            if (get_current_env == null)
-                return;
+            if (get_window_env != null)
+            {
+                _export_file($"{export_path}/{app_name}.bat", windows_content, app_name, get_window_env, "SET", ";", "%PATH%");
+            }
 
-            foreach (var item in get_current_env) { 
-                if (item.Key == "PATH"){
-                    window_env += $"SET {item.Key}={item.Value}\n";
-                    linux_env += $"export {item.Key}={item.Value}\n";
+
+            if (get_linux_env != null)
+            {
+                _export_file($"{export_path}/{app_name}.sh", linux_content, app_name, get_linux_env, "export", ";", "$PATH");
+            }
+        }
+
+        private void _export_file(string save_path, string content, string app_name, Dictionary<string, string> env_key, string args_1, string args_2, string path_env)
+        {
+            string content_env = "";
+            foreach (var item in env_key)
+            {
+                if (item.Key == "PATH")
+                {
+                    content_env += $"{args_1} {item.Key}={item.Value}\n";
                 }
                 else
                 {
-                    window_env += $"SET PATH={item.Value};%PATH%\n";
-                    linux_env += $"export PATH={item.Value}:$PATH\n";
+                    content_env += $"{args_2} PATH={item.Value};{path_env}\n";
                 }
-            
+
             }
-            windows_content = windows_content.Replace("{{rez_env_body}}", window_env).Replace("{{run_app}}", app_name);
-
-            File.WriteAllText($"{export_path}/{app_name}.bat", windows_content);
-
-
+            content = content.Replace("{{rez_env_body}}", content_env).Replace("{{run_app}}", app_name);
+            File.WriteAllText(save_path, content);
         }
 
         public void cp_python_path_to_local()
